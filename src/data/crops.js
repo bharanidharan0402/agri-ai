@@ -1,0 +1,28 @@
+export const crops = [
+  { name: "Tomato", category: "Vegetables", icon: "🍅", nReq: 120, pReq: 80, kReq: 150, season: "Rabi / Summer", water: "Medium", duration: "90-120 days", soilpH: "6.0-6.8" },
+  { name: "Rice", category: "Grains", icon: "🌾", nReq: 100, pReq: 50, kReq: 80, season: "Kharif", water: "High", duration: "120-150 days", soilpH: "5.5-6.5" },
+  { name: "Wheat", category: "Grains", icon: "🌾", nReq: 120, pReq: 60, kReq: 40, season: "Rabi", water: "Medium", duration: "100-120 days", soilpH: "6.0-7.5" },
+  { name: "Maize", category: "Grains", icon: "🌽", nReq: 150, pReq: 75, kReq: 40, season: "Kharif", water: "Medium", duration: "80-110 days", soilpH: "5.5-7.5" },
+  { name: "Sugarcane", category: "Cash Crops", icon: "🎋", nReq: 200, pReq: 100, kReq: 150, season: "Year-round", water: "Very High", duration: "12-18 months", soilpH: "6.0-7.5" },
+  { name: "Cotton", category: "Cash Crops", icon: "☁️", nReq: 80, pReq: 40, kReq: 40, season: "Kharif", water: "Medium", duration: "150-180 days", soilpH: "6.0-8.0" },
+  { name: "Groundnut", category: "Oilseeds", icon: "🥜", nReq: 20, pReq: 40, kReq: 50, season: "Kharif / Rabi", water: "Low", duration: "100-130 days", soilpH: "6.0-6.5" },
+  { name: "Soybean", category: "Oilseeds", icon: "🫘", nReq: 30, pReq: 60, kReq: 40, season: "Kharif", water: "Medium", duration: "90-120 days", soilpH: "6.0-7.0" },
+  { name: "Potato", category: "Vegetables", icon: "🥔", nReq: 150, pReq: 100, kReq: 150, season: "Rabi", water: "Medium", duration: "75-120 days", soilpH: "5.0-6.5" },
+  { name: "Onion", category: "Vegetables", icon: "🧅", nReq: 100, pReq: 50, kReq: 60, season: "Rabi / Kharif", water: "Low-Medium", duration: "100-150 days", soilpH: "6.0-7.0" },
+  { name: "Chili", category: "Vegetables", icon: "🌶️", nReq: 100, pReq: 50, kReq: 50, season: "Kharif / Rabi", water: "Medium", duration: "120-150 days", soilpH: "6.0-7.0" },
+  { name: "Brinjal", category: "Vegetables", icon: "🍆", nReq: 100, pReq: 50, kReq: 50, season: "Year-round", water: "Medium", duration: "90-120 days", soilpH: "5.5-6.5" },
+  { name: "Mango", category: "Fruits", icon: "🥭", nReq: 200, pReq: 100, kReq: 200, season: "Summer", water: "Low", duration: "Perennial", soilpH: "5.5-7.5" },
+  { name: "Banana", category: "Fruits", icon: "🍌", nReq: 200, pReq: 60, kReq: 300, season: "Year-round", water: "High", duration: "9-12 months", soilpH: "6.0-7.5" },
+  { name: "Coconut", category: "Fruits", icon: "🥥", nReq: 50, pReq: 40, kReq: 120, season: "Year-round", water: "Medium", duration: "Perennial", soilpH: "5.0-8.0" },
+  { name: "Turmeric", category: "Spices", icon: "🟡", nReq: 60, pReq: 30, kReq: 120, season: "Kharif", water: "Medium", duration: "7-9 months", soilpH: "5.0-7.5" },
+  { name: "Ginger", category: "Spices", icon: "🫚", nReq: 75, pReq: 50, kReq: 50, season: "Kharif", water: "High", duration: "8-10 months", soilpH: "5.5-6.5" },
+  { name: "Tea", category: "Cash Crops", icon: "🍵", nReq: 120, pReq: 60, kReq: 80, season: "Year-round", water: "High", duration: "Perennial", soilpH: "4.5-5.5" },
+  { name: "Coffee", category: "Cash Crops", icon: "☕", nReq: 80, pReq: 40, kReq: 80, season: "Year-round", water: "Medium", duration: "Perennial", soilpH: "6.0-6.5" },
+  { name: "Sunflower", category: "Oilseeds", icon: "🌻", nReq: 60, pReq: 40, kReq: 30, season: "Kharif / Rabi", water: "Low", duration: "80-100 days", soilpH: "6.0-7.5" },
+  { name: "Mustard", category: "Oilseeds", icon: "🌼", nReq: 80, pReq: 40, kReq: 20, season: "Rabi", water: "Low", duration: "100-130 days", soilpH: "6.0-7.0" },
+  { name: "Cabbage", category: "Vegetables", icon: "🥬", nReq: 130, pReq: 60, kReq: 100, season: "Rabi", water: "Medium", duration: "80-100 days", soilpH: "6.0-6.8" },
+  { name: "Cauliflower", category: "Vegetables", icon: "🥦", nReq: 120, pReq: 60, kReq: 80, season: "Rabi", water: "Medium", duration: "90-120 days", soilpH: "6.0-7.0" },
+  { name: "Carrot", category: "Vegetables", icon: "🥕", nReq: 50, pReq: 40, kReq: 80, season: "Rabi", water: "Low-Medium", duration: "80-100 days", soilpH: "6.0-6.8" },
+];
+
+export const cropCategories = ["All", "Vegetables", "Fruits", "Grains", "Cash Crops", "Oilseeds", "Spices"];
