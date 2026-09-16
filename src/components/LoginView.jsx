@@ -35,7 +35,7 @@ export default function LoginView({ onLogin, t }) {
         <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 text-xs text-slate-600 space-y-2 mb-6 leading-relaxed">
           <div className="flex items-center gap-2 text-emerald-700 font-bold uppercase tracking-wider text-[10px]">
             <Zap className="w-3.5 h-3.5" />
-            {t("Kongu Hackathon Demonstration")}
+            {t("SIH DEMO ")}
           </div>
           <p>{t("This platform coordinates live soil diagnostics, automated solenoid irrigation schedules, and pest sonic deterrent waves.")}</p>
           <p className="text-[11px] text-slate-500 italic">
