@@ -18,17 +18,65 @@ export default function VoiceAssistant({ onClose, sensors, cropName, location, w
     setSpeaking(false);
   };
 
-  const speakText = (text) => {
-    if (!window.speechSynthesis) return;
-    stopSpeaking();
-    setSpeaking(true);
-    const cleaned = text.replace(/[*_#`\-]/g, "");
-    const utt = new SpeechSynthesisUtterance(cleaned);
-    utt.lang = language === "Tamil" ? "ta-IN" : language === "Hindi" ? "hi-IN" : "en-US";
-    utt.onend = () => setSpeaking(false);
-    utt.onerror = () => setSpeaking(false);
-    window.speechSynthesis.speak(utt);
-  };
+window.speechSynthesis.onvoiceschanged = () => {
+  window.speechSynthesis.getVoices();
+};
+
+const speakText = (text) => {
+  if (!window.speechSynthesis) return;
+
+  stopSpeaking();
+  setSpeaking(true);
+
+  const cleaned = text.replace(/[*_#`\-]/g, "");
+  const utt = new SpeechSynthesisUtterance(cleaned);
+
+  const voices = window.speechSynthesis.getVoices();
+  console.log(voices.map(v => `${v.name} — ${v.lang}`));
+
+  if (language === "Tamil") {
+    utt.lang = "ta-IN";
+
+    const tamilVoice = voices.find(
+      (voice) =>
+        voice.lang.toLowerCase() === "ta-in" ||
+        voice.lang.toLowerCase().startsWith("ta")
+    );
+
+    if (tamilVoice) {
+      utt.voice = tamilVoice;
+    }
+  } else if (language === "Hindi") {
+    utt.lang = "hi-IN";
+
+    const hindiVoice = voices.find(
+      (voice) =>
+        voice.lang.toLowerCase() === "hi-in" ||
+        voice.lang.toLowerCase().startsWith("hi")
+    );
+
+    if (hindiVoice) {
+      utt.voice = hindiVoice;
+    }
+  } else {
+    utt.lang = "en-US";
+
+    const englishVoice = voices.find(
+      (voice) =>
+        voice.lang.toLowerCase() === "en-us" ||
+        voice.lang.toLowerCase().startsWith("en")
+    );
+
+    if (englishVoice) {
+      utt.voice = englishVoice;
+    }
+  }
+
+  utt.onend = () => setSpeaking(false);
+  utt.onerror = () => setSpeaking(false);
+
+  window.speechSynthesis.speak(utt);
+};
 
   const processQuery = async (query) => {
     if (!query.trim()) return;
