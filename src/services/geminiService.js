@@ -1,6 +1,8 @@
 // Gemini API service for chatbot and voice assistant
-// Set your API key here or via the settings panel in the app
-let GEMINI_API_KEY = "";
+
+// Read API key from Vite/Vercel environment variable.
+// The Settings panel can still override it during the current session.
+let GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
 
 export function setGeminiApiKey(key) {
   GEMINI_API_KEY = key;
