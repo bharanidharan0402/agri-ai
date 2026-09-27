@@ -2,11 +2,11 @@ import { Camera, Sprout, Droplets, Cpu, Search } from 'lucide-react';
 
 export default function QuickActionButtons({ onOpenWorkspace, t }) {
   const actions = [
-    { id: "monitor", label: "Camera Monitor", icon: Camera, color: "bg-slate-800 hover:bg-slate-700 text-white" },
-    { id: "recom", label: "Crop Match", icon: Sprout, color: "bg-emerald-600 hover:bg-emerald-500 text-white" },
-    { id: "irrigation", label: "Irrigation", icon: Droplets, color: "bg-blue-600 hover:bg-blue-500 text-white" },
-    { id: "circuits", label: "Repellers", icon: Cpu, color: "bg-purple-600 hover:bg-purple-500 text-white" },
-    { id: "pathology", label: "Pathology", icon: Search, color: "bg-rose-600 hover:bg-rose-500 text-white" },
+    { id: 'monitor', label: 'Camera Monitor', icon: Camera, textCol: 'text-amber-800', bgCol: 'bg-amber-50', borderCol: 'border-amber-200' },
+    { id: 'recom', label: 'Crop Match', icon: Sprout, textCol: 'text-emerald-800', bgCol: 'bg-emerald-50', borderCol: 'border-emerald-200' },
+    { id: 'irrigation', label: 'Irrigation', icon: Droplets, textCol: 'text-blue-800', bgCol: 'bg-blue-50', borderCol: 'border-blue-200' },
+    { id: 'circuits', label: 'Repellers', icon: Cpu, textCol: 'text-purple-800', bgCol: 'bg-purple-50', borderCol: 'border-purple-200' },
+    { id: 'pathology', label: 'Pathology', icon: Search, textCol: 'text-red-800', bgCol: 'bg-red-50', borderCol: 'border-red-200' },
   ];
 
   return (
@@ -15,10 +15,12 @@ export default function QuickActionButtons({ onOpenWorkspace, t }) {
         <button
           key={action.id}
           onClick={() => onOpenWorkspace(action.id)}
-          className={`${action.color} px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer shadow-sm hover:shadow-md`}
+          className={`px-4 py-2.5 rounded-2xl text-xs font-bold font-mono transition flex items-center gap-2 cursor-pointer shadow-xs hover:shadow-sm active:scale-95 bg-white border ${action.borderCol} hover:bg-slate-50 text-slate-800`}
         >
-          <action.icon className="w-4 h-4" />
-          {action.label}
+          <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${action.bgCol} ${action.textCol}`}>
+            <action.icon className="w-3.5 h-3.5" />
+          </div>
+          <span>{t(action.label)}</span>
         </button>
       ))}
     </div>

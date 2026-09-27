@@ -45,7 +45,7 @@ export default function CropRecommendations({ npk, location, currentTemp, onSele
                   {crop.category} • {crop.season}
                 </div>
                 <div className="text-[10px] text-slate-400 font-mono mt-0.5">
-                  Needs: N:{crop.nReq} P:{crop.pReq} K:{crop.kReq} • pH:{crop.soilpH}
+                  Needs: N:{crop.nReq} P:{crop.pReq} K:{crop.kReq}
                 </div>
                 <div className="flex gap-1.5 mt-2">
                   <span className="text-[9px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-mono">{crop.water} water</span>

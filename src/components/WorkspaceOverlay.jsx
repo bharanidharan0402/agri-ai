@@ -15,36 +15,36 @@ export default function WorkspaceOverlay({
   onAskGemini, onSelectCrop,
 }) {
   const titles = {
-    monitor: "Camera Monitor",
-    recom: "Crop Matches",
-    irrigation: "Irrigation Control",
-    circuits: "Repellers & Vibration",
-    pathology: "Pathology Lab",
+    monitor:    'Camera Monitor',
+    recom:      'Crop Matches',
+    irrigation: 'Irrigation Control',
+    circuits:   'Repellers & Vibration',
+    pathology:  'Pathology Lab',
   };
 
   return (
-    <div className="fixed inset-0 bg-white z-[9999] overflow-y-auto min-h-screen flex flex-col">
+    <div className="fixed inset-0 z-[9999] overflow-y-auto min-h-screen flex flex-col bg-slate-50 text-slate-900">
       {/* Header */}
-      <div className="w-full bg-white border-b border-slate-200 py-4 px-6 flex items-center justify-between sticky top-0 z-50">
+      <div className="bg-white border-b border-slate-200 w-full py-4 px-6 flex items-center justify-between sticky top-0 z-50 shadow-xs">
         <button
           onClick={onClose}
-          className="text-slate-500 hover:text-slate-800 font-mono text-xs flex items-center gap-1.5 cursor-pointer bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-full px-4 py-1.5 transition-all duration-150 font-bold"
+          className="font-mono text-xs flex items-center gap-1.5 cursor-pointer rounded-full px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 transition font-bold border border-slate-300"
         >
           ← Back to Control Center
         </button>
-        <span className="text-[11px] font-bold font-mono text-slate-400 uppercase tracking-widest">
+        <span className="text-xs font-bold font-mono text-emerald-800 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
           {titles[workspace] || workspace} Workspace
         </span>
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex items-start justify-center p-6 bg-white">
-        <div className="w-full max-w-4xl bg-white rounded-3xl p-2">
-          {workspace === "monitor" && (
+      <div className="flex-1 flex items-start justify-center p-6">
+        <div className="w-full max-w-4xl rounded-3xl p-2">
+          {workspace === 'monitor' && (
             <CameraMonitor luxRating={luxRating} repellent={repellent} t={t} />
           )}
 
-          {workspace === "recom" && (
+          {workspace === 'recom' && (
             <CropRecommendations
               npk={sensors}
               location={location}
@@ -54,7 +54,7 @@ export default function WorkspaceOverlay({
             />
           )}
 
-          {workspace === "irrigation" && (
+          {workspace === 'irrigation' && (
             <div className="max-w-md mx-auto">
               <IrrigationPanel
                 settings={irrigation}
@@ -63,7 +63,7 @@ export default function WorkspaceOverlay({
             </div>
           )}
 
-          {workspace === "circuits" && (
+          {workspace === 'circuits' && (
             <div className="max-w-md mx-auto">
               <PestControlPanel
                 repellent={repellent}
@@ -74,7 +74,7 @@ export default function WorkspaceOverlay({
             </div>
           )}
 
-          {workspace === "pathology" && (
+          {workspace === 'pathology' && (
             <PathologyWorkspace />
           )}
         </div>

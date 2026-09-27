@@ -11,12 +11,15 @@ import VoiceAssistant from './components/VoiceAssistant';
 import WorkspaceOverlay from './components/WorkspaceOverlay';
 import SettingsModal from './components/SettingsModal';
 
+import { getFarmerProfile } from './data/farmerProfiles';
+
 export default function App() {
   // Auth state
   const [operatorName, setOperatorName] = useState("");
+  const [farmArea, setFarmArea] = useState(3.5);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [locationName, setLocationName] = useState("");
-  const [locationInput, setLocationInput] = useState("");
+  const [locationName, setLocationName] = useState("Salem");
+  const [locationInput, setLocationInput] = useState("Salem");
   const [locationConfirmed, setLocationConfirmed] = useState(false);
   const [detectingGPS, setDetectingGPS] = useState(false);
 
@@ -28,14 +31,22 @@ export default function App() {
   const [weather, setWeather] = useState(null);
   const [weatherHistory, setWeatherHistory] = useState([]);
   const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherForecast, setWeatherForecast] = useState({
+    dayByDay: [],
+    hourlyForecast: [],
+    weeklyTrends: [],
+    yearlyData: [],
+  });
 
   // Sensor telemetry
   const [sensors, setSensors] = useState({
     nitrogen: 135, phosphorus: 95, potassium: 145,
-    humidity: 68, soilMoisture: 62, temperature: 28.4, pH: 6.5,
+    humidity: 68, soilMoisture: 58, temperature: 28.4,
   });
   const [pumpStatus, setPumpStatus] = useState("OFF");
-  const [lastProbe, setLastProbe] = useState(null);
+  const [lastProbe, setLastProbe] = useState(
+    new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+  );
   const [probing, setProbing] = useState(false);
   const [luxRating, setLuxRating] = useState(4500);
 
@@ -45,7 +56,7 @@ export default function App() {
 
   // Irrigation
   const [irrigation, setIrrigation] = useState({
-    autoMode: true, pumpStatus: "OFF", moistureThreshold: 45,
+    autoMode: false, pumpStatus: "OFF", moistureThreshold: 45,
     flowRate: 3.2, nextSchedule: "06:00 AM", scheduledTime: "06:00",
   });
 
@@ -60,7 +71,7 @@ export default function App() {
   // Chatbot
   const [chatMessages, setChatMessages] = useState([{
     id: "welcome", role: "assistant",
-    content: "Welcome to **Seed to Circuit**! I am AgriBot, your personal agronomy assistant. Ask me questions about soil nutrients, tomato pathology, micro-irrigation circuits, or pest deterrent controllers.",
+    content: "Welcome to **Human 2 AI**! I am AgriBot, your personal agronomy assistant. Ask me questions about soil nutrients, tomato pathology, micro-irrigation circuits, or pest deterrent controllers.",
     timestamp: new Date(),
   }]);
 
@@ -76,7 +87,13 @@ export default function App() {
       const result = await fetchWeather(city);
       if (result?.current) {
         setWeather(result.current);
-        setWeatherHistory(result.history);
+        setWeatherHistory(result.history || []);
+        setWeatherForecast({
+          dayByDay: result.dayByDay || [],
+          hourlyForecast: result.hourlyForecast || [],
+          weeklyTrends: result.weeklyTrends || [],
+          yearlyData: result.yearlyData || [],
+        });
       }
     } catch (err) {
       console.error("Weather error:", err);
@@ -85,23 +102,22 @@ export default function App() {
     }
   };
 
-  // Fetch ThingSpeak
+  // Fetch ThingSpeak (Pump is 100% user-controlled: background sensor polling NEVER turns it on)
   const loadSensors = async () => {
     try {
       const data = await fetchThingSpeakData();
       if (data) {
         setSensors((prev) => ({
           ...prev,
-          soilMoisture: data.soilMoisture ?? prev.soilMoisture,
+          soilMoisture: data.soilMoisture != null ? data.soilMoisture : prev.soilMoisture,
           temperature: data.temperature ?? prev.temperature,
           humidity: data.humidity ?? prev.humidity,
           nitrogen: data.nitrogen ?? prev.nitrogen,
           phosphorus: data.phosphorus ?? prev.phosphorus,
           potassium: data.potassium ?? prev.potassium,
         }));
-        if (data.pumpStatus) setPumpStatus(data.pumpStatus);
-        if (data.pH) setSensors((p) => ({ ...p, pH: data.pH }));
-        setLastProbe(data.timestamp);
+        // Update timing when reading was collected from the sensors
+        setLastProbe(data.timestamp || new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
       }
     } catch (err) {
       console.error("Sensor fetch error:", err);
@@ -117,59 +133,94 @@ export default function App() {
     }
   }, [isLoggedIn, locationConfirmed]);
 
-  // Simulate pH and lux jitter
+  // Simulate ambient lux variation
   useEffect(() => {
     if (!isLoggedIn || !locationConfirmed) return;
     const interval = setInterval(() => {
-      setSensors((prev) => ({
-        ...prev,
-        pH: Math.round(Math.max(5.5, Math.min(8, prev.pH + (Math.random() > 0.5 ? 0.1 : -0.1))) * 10) / 10,
-      }));
       setLuxRating((prev) => Math.round(Math.max(2000, Math.min(8000, prev + (Math.random() > 0.5 ? 150 : -150)))));
     }, 4000);
     return () => clearInterval(interval);
   }, [isLoggedIn, locationConfirmed]);
 
-  // Login handler
+  // Login handler - automatically calibrates location and farm area from uploaded profile
   const handleLogin = (name) => {
-    setOperatorName(name);
+    const profile = getFarmerProfile(name);
+    setOperatorName(profile.farmerName);
+    setLocationName(profile.location);
+    setLocationInput(profile.location);
+    setFarmArea(profile.acres);
+    if (profile.crop) setCropName(profile.crop);
+    setLocationConfirmed(true);
     setIsLoggedIn(true);
+    loadWeather(profile.location);
   };
 
-  // Location handler
+  // Location handler (fallback)
   const handleLocationConfirm = (city) => {
     setLocationName(city);
     setLocationConfirmed(true);
     loadWeather(city);
   };
 
-  // GPS handler
+  // GPS handler with high-precision reverse geocoding and automated IP fallback
   const handleGPSDetect = () => {
+    setDetectingGPS(true);
+
+    const fallbackToIP = async () => {
+      try {
+        const res = await fetch("https://ipwho.is/");
+        const data = await res.json();
+        let detected = data.city || data.region || "Salem";
+        // Cellular ISP tower routing often misidentifies Salem as Ariyalur
+        if (detected.toLowerCase().includes("ariyalur")) {
+          detected = "Salem";
+        }
+        setLocationInput(detected);
+      } catch {
+        setLocationInput("Salem");
+      } finally {
+        setDetectingGPS(false);
+      }
+    };
+
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.");
+      fallbackToIP();
       return;
     }
-    setDetectingGPS(true);
+
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const { latitude, longitude } = pos.coords;
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const res = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          );
           const geo = await res.json();
-          const addr = geo.address || {};
-          const city = addr.city || addr.town || addr.village || addr.suburb || addr.state_district || "Coimbatore";
+          let city = geo.city || geo.locality || geo.principalSubdivision || "Salem";
+          if (city.toLowerCase().includes("ariyalur")) {
+            city = "Salem";
+          }
           setLocationInput(city);
         } catch {
-          setLocationInput("Coimbatore");
+          await fallbackToIP();
         } finally {
           setDetectingGPS(false);
         }
       },
       () => {
-        setDetectingGPS(false);
-        alert("Could not access your location. Please enter it manually.");
-      }
+        fallbackToIP();
+      },
+      { timeout: 7000, enableHighAccuracy: true }
     );
+  };
+
+  // Manual pump toggle handler for user
+  const handleTogglePump = () => {
+    setPumpStatus((prev) => {
+      const next = prev === "ON" ? "OFF" : "ON";
+      setIrrigation((curr) => ({ ...curr, pumpStatus: next }));
+      return next;
+    });
   };
 
   // Force probe
@@ -202,10 +253,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans relative flex flex-col justify-between">
-      {/* Background blurs */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-screen text-white font-sans relative flex flex-col justify-between">
+      {/* Background orbs */}
+      <div className="fixed top-0 left-1/3 w-[500px] h-[500px] bg-green-900/20 rounded-full blur-[140px] pointer-events-none" />
+      <div className="fixed bottom-1/4 right-1/4 w-[400px] h-[400px] bg-amber-900/15 rounded-full blur-[120px] pointer-events-none" />
+      <div className="fixed top-1/2 left-0 w-72 h-72 bg-green-800/10 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Workspace Overlay */}
       {activeWorkspace && (
@@ -275,17 +327,21 @@ export default function App() {
           />
         )}
 
-        {isLoggedIn && locationConfirmed && weather && (
+        {isLoggedIn && locationConfirmed && (
           <Dashboard
             key="dashboard"
             operatorName={operatorName}
+            farmArea={farmArea}
+            setFarmArea={setFarmArea}
             locationName={locationName}
             language={language}
             setLanguage={setLanguage}
-            weather={weather}
+            weather={weather || { temp: 29.4, humidity: 64, windSpeed: 11, rainfallDaily: 0, condition: "Partly Cloudy" }}
             weatherHistory={weatherHistory}
+            weatherForecast={weatherForecast}
             sensors={sensors}
             pumpStatus={pumpStatus}
+            onTogglePump={handleTogglePump}
             lastProbe={lastProbe}
             probing={probing}
             onForceProbe={handleForceProbe}
