@@ -25,7 +25,7 @@ export default function LoginView({ onLogin, t }) {
             <Leaf className="w-9 h-9 text-white stroke-[2.5]" />
           </div>
           <h1 className="text-3xl font-display font-extrabold tracking-tight bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
-            {t("Seed to Circuit")}
+            {t("Human 2 AI")}
           </h1>
           <p className="text-xs text-slate-500 mt-2 font-mono">
             {t("Smart Agronomy & IoT Edge Micro-Controller Dashboard")}
